@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.tai.model.domain.calculation.CodingComponent
+import uk.gov.hmrc.tai.model.domain.calculation.{BankInterestIncomeCategory, CodingComponent}
 import uk.gov.hmrc.tai.model.domain.formatters.TaxAccountSummaryHodFormatters
 import uk.gov.hmrc.tai.model.domain._
 import uk.gov.hmrc.tai.model.tai.TaxYear
@@ -49,8 +49,13 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
       val totalIyaIntoCY = (taxCodeIncomes map (_.inYearAdjustmentIntoCY) sum)
       val totalIya = (taxCodeIncomes map (_.totalInYearAdjustment) sum)
       val totalIyatIntoCYPlusOne = (taxCodeIncomes map (_.inYearAdjustmentIntoCYPlusOne) sum)
-      val incomeCategoriesSum = totalTax.incomeCategories.map(_.totalTaxableIncome).sum
-      val totalEstimatedIncome = if (incomeCategoriesSum == 0) totalTax.incomeCategories.map(_.totalIncome).sum else incomeCategoriesSum + taxFreeAllowance
+      val incomeCategoriesSum = totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+
+      val totalEstimatedIncome = if (incomeCategoriesSum == 0) {
+        totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalIncome).sum
+      } else {
+          incomeCategoriesSum + taxFreeAllowance
+        }
 
       TaxAccountSummary(totalEstimatedTax, taxFreeAmount, totalIyaIntoCY, totalIya, totalIyatIntoCYPlusOne, totalEstimatedIncome, taxFreeAllowance)
     }
