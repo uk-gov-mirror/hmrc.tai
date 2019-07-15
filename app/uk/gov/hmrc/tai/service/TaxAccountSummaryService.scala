@@ -72,8 +72,8 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
   }
 
   private def totalBBSIAmount(incomeCategories: Seq[IncomeCategory]):BigDecimal={
-    val isBBSIZero=incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTax).sum
-    if (isBBSIZero == 0) {
+    val bbsiTotalTax=incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTax).sum
+    if (bbsiTotalTax == 0) {
       0
     }
     else {
