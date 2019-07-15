@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.tai.model.domain.calculation.{BankInterestIncomeCategory, CodingComponent}
+import uk.gov.hmrc.tai.model.domain.calculation.{BankInterestIncomeCategory, CodingComponent, IncomeCategory}
 import uk.gov.hmrc.tai.model.domain.formatters.TaxAccountSummaryHodFormatters
 import uk.gov.hmrc.tai.model.domain._
 import uk.gov.hmrc.tai.model.tai.TaxYear
@@ -46,16 +46,18 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
     } yield {
 
       val taxFreeAmount = taxFreeAmountCalculation(taxFreeAmountComponents)
-      val totalIyaIntoCY = (taxCodeIncomes map (_.inYearAdjustmentIntoCY) sum)
-      val totalIya = (taxCodeIncomes map (_.totalInYearAdjustment) sum)
-      val totalIyatIntoCYPlusOne = (taxCodeIncomes map (_.inYearAdjustmentIntoCYPlusOne) sum)
-      val incomeCategoriesSum = totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+      val totalIyaIntoCY = taxCodeIncomes map (_.inYearAdjustmentIntoCY) sum
+      val totalIya = taxCodeIncomes map (_.totalInYearAdjustment) sum
+      val totalIyatIntoCYPlusOne = taxCodeIncomes map (_.inYearAdjustmentIntoCYPlusOne) sum
+      val incomeCategoriesSum = totalTax.incomeCategories.map(_.totalTaxableIncome).sum
 
       val totalEstimatedIncome = if (incomeCategoriesSum == 0) {
         totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalIncome).sum
       } else {
-          incomeCategoriesSum + taxFreeAllowance
-        }
+        val totalBBSI =  totalBBSIAmount(totalTax.incomeCategories)
+        val incomeCategoriesSumWithoutBBSI = totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+        incomeCategoriesSumWithoutBBSI + taxFreeAllowance + totalBBSI
+      }
 
       TaxAccountSummary(totalEstimatedTax, taxFreeAmount, totalIyaIntoCY, totalIya, totalIyatIntoCYPlusOne, totalEstimatedIncome, taxFreeAllowance)
     }
@@ -67,5 +69,15 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
         case _: AllowanceComponentType => total + component.amount.abs
         case _ => total - component.amount.abs
       })
+  }
+
+  private def totalBBSIAmount(incomeCategories: Seq[IncomeCategory]):BigDecimal={
+    val isBBSIZero=incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTax).sum
+    if (isBBSIZero == 0) {
+      0
+    }
+    else {
+      incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+    }
   }
 }

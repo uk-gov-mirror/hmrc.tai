@@ -229,7 +229,7 @@ class TaxAccountSummaryServiceSpec extends PlaySpec with MockitoSugar {
     }
 
     "return TaxAccount summary with tax free allowance and taxableIncome" when {
-      "liability sections are present" in {
+      "liability sections are present and BBSI is NOT added when BBSI total tax is 0" in {
         val taxFreeAmountCompnents = Seq(
           CodingComponent(PersonalAllowancePA, Some(234), 5000, "PersonalAllowancePA")
         )
@@ -261,9 +261,117 @@ class TaxAccountSummaryServiceSpec extends PlaySpec with MockitoSugar {
 
         val result = Await.result(sut.taxAccountSummary(nino, TaxYear()), 5.seconds)
 
+        result.totalEstimatedIncome mustBe 17000
+        result.taxFreeAllowance mustBe 1000
+      }
+
+      "liability sections are present and BBSI is added when BBSI total tax greater than 0" in {
+        val taxFreeAmountCompnents = Seq(
+          CodingComponent(PersonalAllowancePA, Some(234), 5000, "PersonalAllowancePA")
+        )
+        val mockcodingComponentService = mock[CodingComponentService]
+        when(mockcodingComponentService.codingComponents(Matchers.eq(nino), any())(any())).thenReturn(Future.successful(taxFreeAmountCompnents))
+
+        val mockIncomeService = mock[IncomeService]
+        when(mockIncomeService.taxCodeIncomes(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(Seq.empty[TaxCodeIncome]))
+
+        val mockTaxAccountSummaryRepository = mock[TaxAccountSummaryRepository]
+        when(mockTaxAccountSummaryRepository.taxAccountSummary(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(BigDecimal(1111)))
+
+        val mockTotalTaxService = mock[TotalTaxService]
+        val incomeCategories = Seq(
+          IncomeCategory(NonSavingsIncomeCategory, 0, 1000, 0, Seq.empty[TaxBand]),
+          IncomeCategory(UntaxedInterestIncomeCategory, 0, 2000, 0, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignDividendsIncomeCategory, 0, 3000, 0, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignInterestIncomeCategory, 0, 4000, 0, Seq.empty[TaxBand]),
+          IncomeCategory(BankInterestIncomeCategory, 500, 5000, 5000, Seq.empty[TaxBand]),
+          IncomeCategory(UkDividendsIncomeCategory, 0, 6000, 0, Seq.empty[TaxBand])
+        )
+        val totalTax  = TotalTax(0, incomeCategories, None, None, None)
+        when(mockTotalTaxService.totalTax(any(), any())(any())).thenReturn(Future.successful(totalTax))
+        when(mockTotalTaxService.taxFreeAllowance(any(), any())(any())).thenReturn(Future.successful(BigDecimal(1000)))
+
+        val sut = createSUT(mockTaxAccountSummaryRepository, mockcodingComponentService, mockIncomeService, mockTotalTaxService)
+
+        val result = Await.result(sut.taxAccountSummary(nino, TaxYear()), 5.seconds)
+
         result.totalEstimatedIncome mustBe 22000
         result.taxFreeAllowance mustBe 1000
       }
+
+      "having no taxable income will return the total income" in {
+        val taxFreeAmountCompnents = Seq(
+          CodingComponent(PersonalAllowancePA, Some(234), 5000, "PersonalAllowancePA")
+        )
+        val mockcodingComponentService = mock[CodingComponentService]
+        when(mockcodingComponentService.codingComponents(Matchers.eq(nino), any())(any())).thenReturn(Future.successful(taxFreeAmountCompnents))
+
+        val mockIncomeService = mock[IncomeService]
+        when(mockIncomeService.taxCodeIncomes(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(Seq.empty[TaxCodeIncome]))
+
+        val mockTaxAccountSummaryRepository = mock[TaxAccountSummaryRepository]
+        when(mockTaxAccountSummaryRepository.taxAccountSummary(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(BigDecimal(1111)))
+
+        val mockTotalTaxService = mock[TotalTaxService]
+        val incomeCategories = Seq(
+          IncomeCategory(NonSavingsIncomeCategory, 0, 0, 100, Seq.empty[TaxBand]),
+          IncomeCategory(UntaxedInterestIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignDividendsIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignInterestIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+         // IncomeCategory(BankInterestIncomeCategory, 500, 5000, 5000, Seq.empty[TaxBand]),
+          IncomeCategory(UkDividendsIncomeCategory, 0, 0, 200, Seq.empty[TaxBand])
+        )
+        val totalTax  = TotalTax(0, incomeCategories, None, None, None)
+        when(mockTotalTaxService.totalTax(any(), any())(any())).thenReturn(Future.successful(totalTax))
+        when(mockTotalTaxService.taxFreeAllowance(any(), any())(any())).thenReturn(Future.successful(BigDecimal(1000)))
+
+        val sut = createSUT(mockTaxAccountSummaryRepository, mockcodingComponentService, mockIncomeService, mockTotalTaxService)
+
+        val result = Await.result(sut.taxAccountSummary(nino, TaxYear()), 5.seconds)
+
+        result.totalEstimatedIncome mustBe 900
+        result.taxFreeAllowance mustBe 1000
+      }
+      "having taxable income but ignore BBSI when you don't pay tax on BBSI" in {
+        val taxFreeAmountCompnents = Seq(
+          CodingComponent(PersonalAllowancePA, Some(234), 5000, "PersonalAllowancePA")
+        )
+        val mockcodingComponentService = mock[CodingComponentService]
+        when(mockcodingComponentService.codingComponents(Matchers.eq(nino), any())(any())).thenReturn(Future.successful(taxFreeAmountCompnents))
+
+        val mockIncomeService = mock[IncomeService]
+        when(mockIncomeService.taxCodeIncomes(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(Seq.empty[TaxCodeIncome]))
+
+        val mockTaxAccountSummaryRepository = mock[TaxAccountSummaryRepository]
+        when(mockTaxAccountSummaryRepository.taxAccountSummary(Matchers.eq(nino), any())(any()))
+          .thenReturn(Future.successful(BigDecimal(1111)))
+
+        val mockTotalTaxService = mock[TotalTaxService]
+        val incomeCategories = Seq(
+          IncomeCategory(NonSavingsIncomeCategory, 0, 0, 100, Seq.empty[TaxBand]),
+          IncomeCategory(UntaxedInterestIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignDividendsIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+          IncomeCategory(ForeignInterestIncomeCategory, 0, 0, 200, Seq.empty[TaxBand]),
+          IncomeCategory(BankInterestIncomeCategory, 0, 0, 1000, Seq.empty[TaxBand]),
+          IncomeCategory(UkDividendsIncomeCategory, 0, 0, 200, Seq.empty[TaxBand])
+        )
+        val totalTax  = TotalTax(0, incomeCategories, None, None, None)
+        when(mockTotalTaxService.totalTax(any(), any())(any())).thenReturn(Future.successful(totalTax))
+        when(mockTotalTaxService.taxFreeAllowance(any(), any())(any())).thenReturn(Future.successful(BigDecimal(1000)))
+
+        val sut = createSUT(mockTaxAccountSummaryRepository, mockcodingComponentService, mockIncomeService, mockTotalTaxService)
+
+        val result = Await.result(sut.taxAccountSummary(nino, TaxYear()), 5.seconds)
+
+        result.totalEstimatedIncome mustBe 900
+        result.taxFreeAllowance mustBe 1000
+      }
+
 
       "tax free allowance is zero" in {
         val taxFreeAmountCompnents = Seq(
