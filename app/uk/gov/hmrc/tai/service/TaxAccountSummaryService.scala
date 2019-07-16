@@ -49,13 +49,14 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
       val totalIyaIntoCY = taxCodeIncomes map (_.inYearAdjustmentIntoCY) sum
       val totalIya = taxCodeIncomes map (_.totalInYearAdjustment) sum
       val totalIyatIntoCYPlusOne = taxCodeIncomes map (_.inYearAdjustmentIntoCYPlusOne) sum
-      val incomeCategoriesSum = totalTax.incomeCategories.map(_.totalTaxableIncome).sum
+      val totalTaxableIncome = totalTax.incomeCategories.map(_.totalTaxableIncome).sum
 
-      val totalEstimatedIncome = if (incomeCategoriesSum == 0) {
-        totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalIncome).sum
+      val incomeCategoriesWithoutBankInterest=totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory)
+      val totalEstimatedIncome = if (totalTaxableIncome == 0) {
+        incomeCategoriesWithoutBankInterest.map(_.totalIncome).sum
       } else {
         val totalBBSI =  totalBBSIAmount(totalTax.incomeCategories)
-        val incomeCategoriesSumWithoutBBSI = totalTax.incomeCategories.withFilter(_.incomeCategoryType != BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+        val incomeCategoriesSumWithoutBBSI = incomeCategoriesWithoutBankInterest.map(_.totalTaxableIncome).sum
         incomeCategoriesSumWithoutBBSI + taxFreeAllowance + totalBBSI
       }
 
@@ -72,12 +73,14 @@ class TaxAccountSummaryService @Inject()(taxAccountSummaryRepository: TaxAccount
   }
 
   private def totalBBSIAmount(incomeCategories: Seq[IncomeCategory]):BigDecimal={
-    val bbsiTotalTax=incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTax).sum
+    val bankInterestCategoryOnly=incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory)
+    val bbsiTotalTax=bankInterestCategoryOnly.map(_.totalTax).sum
     if (bbsiTotalTax == 0) {
       0
     }
     else {
-      incomeCategories.withFilter(_.incomeCategoryType == BankInterestIncomeCategory).map(_.totalTaxableIncome).sum
+      bankInterestCategoryOnly.map(_.totalTaxableIncome).sum
     }
   }
+
 }
