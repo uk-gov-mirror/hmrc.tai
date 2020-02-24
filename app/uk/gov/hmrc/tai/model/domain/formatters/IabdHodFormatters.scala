@@ -20,6 +20,8 @@ import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, _}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.tai.util.IabdTypeConstants
 
 trait IabdHodFormatters extends IabdTypeConstants {
@@ -47,7 +49,7 @@ trait IabdHodFormatters extends IabdTypeConstants {
         override def reads(json: JsValue): JsResult[LocalDate] = json match {
           case JsString(dateRegex(d, m, y)) =>
             JsSuccess(new LocalDate(y.toInt, m.toInt, d.toInt))
-          case invalid => JsError(ValidationError(s"Invalid date format [dd/MM/yyyy]: $invalid"))
+          case invalid => JsError(s"Invalid date format [dd/MM/yyyy]: $invalid")
         }
       },
       new Writes[LocalDate] {

@@ -20,6 +20,8 @@ import play.api.libs.json.{Format, _}
 import uk.gov.hmrc.tai.model.EmploymentUpdate
 import uk.gov.hmrc.tai.model.domain._
 import uk.gov.hmrc.tai.model.tai.TaxYear
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 trait EmploymentMongoFormatters {
   implicit val formatAdjustment: Format[Adjustment] = Json.format[Adjustment]

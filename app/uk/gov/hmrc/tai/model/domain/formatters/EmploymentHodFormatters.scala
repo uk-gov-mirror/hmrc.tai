@@ -23,7 +23,8 @@ import play.api.libs.json._
 import uk.gov.hmrc.tai.model.api.EmploymentCollection
 import uk.gov.hmrc.tai.model.domain.{EndOfTaxYearUpdate, _}
 import uk.gov.hmrc.tai.model.tai.{JsonExtra, TaxYear}
-
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import scala.util.matching.Regex
 import scala.util.{Success, Try}
 
@@ -40,7 +41,7 @@ trait EmploymentHodFormatters {
         override def reads(json: JsValue): JsResult[LocalDate] = json match {
           case JsString(dateRegex(d, m, y)) =>
             JsSuccess(new LocalDate(y.toInt, m.toInt, d.toInt))
-          case invalid => JsError(ValidationError(s"Invalid date format [dd/MM/yyyy]: $invalid"))
+          case invalid => JsError(s"Invalid date format [dd/MM/yyyy]: $invalid")
         }
       },
       new Writes[LocalDate] {

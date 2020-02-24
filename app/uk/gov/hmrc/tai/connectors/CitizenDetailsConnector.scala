@@ -25,7 +25,6 @@ import uk.gov.hmrc.tai.audit.Auditor
 import uk.gov.hmrc.tai.metrics.Metrics
 import uk.gov.hmrc.tai.model.enums.APITypes
 import uk.gov.hmrc.tai.model.nps.PersonDetails
-
 import scala.concurrent.Future
 
 @Singleton

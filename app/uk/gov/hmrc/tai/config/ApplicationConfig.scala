@@ -18,7 +18,8 @@ package uk.gov.hmrc.tai.config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 
 trait HodConfig {
   val baseURL: String
@@ -28,7 +29,7 @@ trait HodConfig {
 }
 
 abstract class BaseConfig(playEnv: Environment) extends ServicesConfig {
-  override val mode = playEnv.mode
+  val mode = playEnv.mode
 }
 
 @Singleton

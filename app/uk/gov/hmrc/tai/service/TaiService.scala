@@ -37,9 +37,9 @@ import uk.gov.hmrc.tai.model.rti.{RtiData, RtiStatus}
 import uk.gov.hmrc.tai.model.tai.{AnnualAccount, TaxYear}
 import uk.gov.hmrc.tai.util.TaiConstants._
 import uk.gov.hmrc.tai.util.{DateTimeHelper, TaiConstants}
-
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 @Singleton
 class TaiService @Inject()(
@@ -52,6 +52,7 @@ class TaiService @Inject()(
   auditor: Auditor,
   featureTogglesConfig: FeatureTogglesConfig,
   npsConfig: NpsConfig,
+  ec: ExecutionContext,
   cyPlusOneConfig: CyPlusOneConfig)
     extends NpsFormatter {
 
