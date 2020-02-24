@@ -19,7 +19,7 @@ package uk.gov.hmrc.tai.repositories
 import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{never, times, verify, when}
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.tai.connectors.{BbsiConnector, CacheConnector}
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate

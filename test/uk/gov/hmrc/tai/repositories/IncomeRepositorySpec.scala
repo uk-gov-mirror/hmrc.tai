@@ -20,7 +20,7 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.domain.{Generator, Nino}
@@ -31,7 +31,7 @@ import uk.gov.hmrc.tai.model.domain.income._
 import uk.gov.hmrc.tai.model.tai.TaxYear
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.Random
 
@@ -551,6 +551,7 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
   private def createSut(
     taxAccountRepository: TaxAccountRepository = mock[TaxAccountRepository],
     bbsiRepository: BbsiRepository = mock[BbsiRepository],
-    iabdRepository: IabdRepository = mock[IabdRepository]) =
-    new IncomeRepository(taxAccountRepository, bbsiRepository, iabdRepository)
+    iabdRepository: IabdRepository = mock[IabdRepository],
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new IncomeRepository(taxAccountRepository, bbsiRepository, iabdRepository, ec)
 }

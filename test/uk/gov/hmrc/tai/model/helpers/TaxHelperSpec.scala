@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.tai.model.helpers
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.tai.calculators.TaxCalculator
 import uk.gov.hmrc.tai.model.Tax

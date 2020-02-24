@@ -19,7 +19,7 @@ package uk.gov.hmrc.tai.controllers
 import data.NpsData
 import org.mockito.Matchers.{any, eq => Meq}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import play.api.test.Helpers.{contentAsJson, _}

@@ -20,7 +20,7 @@ import org.joda.time.{Days, LocalDate}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito.{never, times, verify, when}
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.{Await, Future}

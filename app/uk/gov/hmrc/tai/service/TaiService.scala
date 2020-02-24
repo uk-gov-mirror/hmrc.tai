@@ -52,8 +52,7 @@ class TaiService @Inject()(
   auditor: Auditor,
   featureTogglesConfig: FeatureTogglesConfig,
   npsConfig: NpsConfig,
-  implicit val ec: ExecutionContext,
-  cyPlusOneConfig: CyPlusOneConfig)
+  cyPlusOneConfig: CyPlusOneConfig)(implicit ec: ExecutionContext)
     extends NpsFormatter {
 
   val IabdUpdateSourceCustomerEntered: Int = if (featureTogglesConfig.desUpdateEnabled) 39 else 0
