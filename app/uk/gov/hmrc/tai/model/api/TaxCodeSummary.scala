@@ -20,6 +20,8 @@ import org.joda.time.LocalDate
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.tai.model.TaxCodeRecord
 import uk.gov.hmrc.tai.model.tai.TaxYear
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class TaxCodeSummary(
   taxCodeId: Int,

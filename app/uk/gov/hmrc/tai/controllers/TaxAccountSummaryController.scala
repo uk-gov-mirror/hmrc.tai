@@ -19,9 +19,9 @@ package uk.gov.hmrc.tai.controllers
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.model.api.{ApiFormats, ApiResponse}
 import uk.gov.hmrc.tai.model.tai.TaxYear
@@ -31,8 +31,9 @@ import uk.gov.hmrc.tai.util.NpsExceptions
 @Singleton
 class TaxAccountSummaryController @Inject()(
   taxAccountSummaryService: TaxAccountSummaryService,
-  authentication: AuthenticationPredicate)
-    extends BaseController with ApiFormats with NpsExceptions with ControllerErrorHandler {
+  authentication: AuthenticationPredicate,
+  cc: ControllerComponents)
+    extends BackendController(cc) with ApiFormats with NpsExceptions with ControllerErrorHandler {
 
   def taxAccountSummaryForYear(nino: Nino, year: TaxYear): Action[AnyContent] = authentication.async {
     implicit request =>

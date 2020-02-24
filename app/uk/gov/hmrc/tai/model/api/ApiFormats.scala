@@ -22,6 +22,8 @@ import uk.gov.hmrc.tai.model.domain._
 import uk.gov.hmrc.tai.model.domain.benefits.CompanyCarBenefit
 import uk.gov.hmrc.tai.model.domain.income.IncomeSource
 import uk.gov.hmrc.tai.model.tai.TaxYear
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 trait ApiFormats {
 

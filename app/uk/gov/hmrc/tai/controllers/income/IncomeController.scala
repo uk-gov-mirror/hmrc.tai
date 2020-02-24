@@ -19,9 +19,9 @@ package uk.gov.hmrc.tai.controllers.income
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsValue, Json, Writes}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.tai.controllers.ControllerErrorHandler
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.model.api.{ApiFormats, ApiLink, ApiResponse}
@@ -39,8 +39,9 @@ class IncomeController @Inject()(
   incomeService: IncomeService,
   taxAccountService: TaxAccountService,
   employmentService: EmploymentService,
-  authentication: AuthenticationPredicate)
-    extends BaseController with ApiFormats with ControllerErrorHandler {
+  authentication: AuthenticationPredicate,
+  cc: ControllerComponents)
+    extends BackendController(cc) with ApiFormats with ControllerErrorHandler {
 
   def untaxedInterest(nino: Nino): Action[AnyContent] = authentication.async { implicit request =>
     incomeService.untaxedInterest(nino).map {

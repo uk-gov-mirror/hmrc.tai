@@ -52,7 +52,7 @@ class TaiService @Inject()(
   auditor: Auditor,
   featureTogglesConfig: FeatureTogglesConfig,
   npsConfig: NpsConfig,
-  ec: ExecutionContext,
+  implicit val ec: ExecutionContext,
   cyPlusOneConfig: CyPlusOneConfig)
     extends NpsFormatter {
 

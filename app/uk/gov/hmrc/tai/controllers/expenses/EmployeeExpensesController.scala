@@ -33,9 +33,9 @@ package uk.gov.hmrc.tai.controllers.expenses
 
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.tai.controllers.ControllerErrorHandler
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.model.api.ApiFormats
@@ -48,8 +48,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class EmployeeExpensesController @Inject()(
   authentication: AuthenticationPredicate,
-  employeeExpensesService: EmployeeExpensesService
-) extends BaseController with ApiFormats with ControllerErrorHandler {
+  employeeExpensesService: EmployeeExpensesService,
+  cc: ControllerComponents)
+    extends BackendController(cc) with ApiFormats with ControllerErrorHandler {
 
   def updateEmployeeExpensesData(nino: Nino, year: TaxYear, iabd: Int): Action[JsValue] =
     authentication.async(parse.json) { implicit request =>

@@ -40,7 +40,7 @@ package object rti {
       override def reads(json: JsValue): JsResult[LocalDate] = json match {
         case JsString(dateRegex(y, m, d)) =>
           JsSuccess(new LocalDate(y.toInt, m.toInt, d.toInt))
-        case invalid => JsError(ValidationError(s"Invalid date format [yyyy-MM-dd]: $invalid"))
+        case invalid => JsError(JsonValidationError(s"Invalid date format [yyyy-MM-dd]: $invalid"))
       }
     },
     new Writes[LocalDate] {

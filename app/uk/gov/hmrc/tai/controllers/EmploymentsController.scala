@@ -18,10 +18,10 @@ package uk.gov.hmrc.tai.controllers
 
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{BadRequestException, NotFoundException}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.tai.model.api.{ApiFormats, ApiResponse, EmploymentCollection}
 import uk.gov.hmrc.tai.model.domain.{AddEmployment, Employment, EndEmployment, IncorrectEmployment}
 import uk.gov.hmrc.tai.model.tai.TaxYear
@@ -31,8 +31,11 @@ import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.model.error.{EmploymentAccountStubbed, EmploymentNotFound}
 
 @Singleton
-class EmploymentsController @Inject()(employmentService: EmploymentService, authentication: AuthenticationPredicate)
-    extends BaseController with ApiFormats {
+class EmploymentsController @Inject()(
+  employmentService: EmploymentService,
+  authentication: AuthenticationPredicate,
+  cc: ControllerComponents)
+    extends BackendController(cc) with ApiFormats {
 
   def employments(nino: Nino, year: TaxYear): Action[AnyContent] = authentication.async { implicit request =>
     employmentService

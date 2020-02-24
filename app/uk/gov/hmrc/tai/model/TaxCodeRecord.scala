@@ -20,6 +20,8 @@ import org.joda.time.LocalDate
 import play.api.libs.json._
 import uk.gov.hmrc.tai.model.tai.TaxYear
 import uk.gov.hmrc.tai.util.TaxCodeHistoryConstants
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class TaxCodeRecord(
   taxYear: TaxYear,

@@ -18,6 +18,8 @@ package uk.gov.hmrc.tai.model.domain
 
 import org.joda.time.LocalDate
 import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class Person(
   nino: Nino,

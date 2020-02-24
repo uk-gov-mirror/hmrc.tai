@@ -22,6 +22,8 @@ import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.model._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.tai.service.TaiService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,8 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class EstimatedPayCalculatorController @Inject()(
   taiService: TaiService,
   authentication: AuthenticationPredicate,
-  cc: ControllerComponents,
-  ec: ExecutionContext)
+  cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends BackendController(cc) {
 
   def calculateFullYearEstimatedPay(): Action[JsValue] = authentication.async(parse.json) { implicit request =>

@@ -19,10 +19,10 @@ package uk.gov.hmrc.tai.controllers
 import com.google.inject.{Inject, Singleton}
 import play.Logger
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.tai.metrics.Metrics
 import uk.gov.hmrc.tai.model.{SessionData, Tax}
 import uk.gov.hmrc.tai.model.nps2.MongoFormatter
@@ -37,8 +37,9 @@ import uk.gov.hmrc.tai.model.tai.TaxYear
 class TaiController @Inject()(
   taxAccountService: TaxAccountService,
   metrics: Metrics,
-  authentication: AuthenticationPredicate)
-    extends BaseController with MongoFormatter {
+  authentication: AuthenticationPredicate,
+  cc: ControllerComponents)
+    extends BackendController(cc) with MongoFormatter {
 
   def getTaiRoot(nino: Nino): Action[AnyContent] = authentication.async { implicit request =>
     for {

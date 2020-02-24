@@ -30,14 +30,15 @@ import uk.gov.hmrc.tai.model.tai.TaxYear
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import uk.gov.hmrc.tai.model.error.{EmploymentAccountStubbed, EmploymentNotFound, EmploymentRetrievalError}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EmploymentRepository @Inject()(
   rtiConnector: RtiConnector,
   cacheConnector: CacheConnector,
   npsConnector: NpsConnector,
-  auditor: Auditor) {
+  auditor: Auditor,
+  ec: ExecutionContext) {
 
   private val EmploymentMongoKey = "EmploymentData"
 

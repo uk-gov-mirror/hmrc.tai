@@ -23,11 +23,14 @@ import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-
 // $COVERAGE-OFF$ No proper implementation to test
 @Singleton
-class MicroserviceAuthConnector @Inject()(val environment: Environment, val conf: Configuration, val WSHttp: HttpClient, config: ServicesConfig)
-    extends PlayAuthConnector  {
+class MicroserviceAuthConnector @Inject()(
+  val environment: Environment,
+  val conf: Configuration,
+  val WSHttp: HttpClient,
+  config: ServicesConfig)
+    extends PlayAuthConnector {
   protected def runModeConfiguration: Configuration = conf
   protected def mode: Mode = environment.mode
   lazy val serviceUrl = config.baseUrl("auth")
