@@ -18,13 +18,14 @@ package uk.gov.hmrc.tai.controllers
 
 import org.mockito.Matchers
 import org.mockito.Matchers.any
+
 import scala.language.postfixOps
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
@@ -43,6 +44,8 @@ import scala.concurrent.{Await, Future}
 import scala.util.Random
 
 class TotalTaxControllerSpec extends PlaySpec with MockitoSugar with NpsExceptions with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "totalTax" must {
     "return the total tax details for the given year" in {
@@ -197,6 +200,6 @@ class TotalTaxControllerSpec extends PlaySpec with MockitoSugar with NpsExceptio
   private def createSUT(
     totalTaxService: TotalTaxService,
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new TotalTaxController(totalTaxService, authentication)
+    new TotalTaxController(totalTaxService, authentication, cc)
 
 }

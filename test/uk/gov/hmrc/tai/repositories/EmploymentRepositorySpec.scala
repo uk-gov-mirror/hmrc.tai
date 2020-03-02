@@ -34,9 +34,10 @@ import uk.gov.hmrc.tai.model.TaiRoot
 import uk.gov.hmrc.tai.model.domain.{AnnualAccount, EndOfTaxYearUpdate, _}
 import uk.gov.hmrc.tai.model.error.{EmploymentAccountStubbed, EmploymentNotFound}
 import uk.gov.hmrc.tai.model.tai.TaxYear
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.BufferedSource
 import scala.language.postfixOps
 import scala.util.Random
@@ -1660,8 +1661,9 @@ class EmploymentRepositorySpec extends PlaySpec with MockitoSugar {
     rtiConnector: RtiConnector,
     cacheConnector: CacheConnector,
     npsConnector: NpsConnector,
-    auditor: Auditor) =
-    new EmploymentRepository(rtiConnector, cacheConnector, npsConnector, auditor)
+    auditor: Auditor,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new EmploymentRepository(rtiConnector, cacheConnector, npsConnector, auditor, ec)
 
   private def getJson(fileName: String): JsValue = {
     val jsonFilePath = "test/resources/data/EmploymentRepositoryTesting/" + fileName + ".json"

@@ -27,7 +27,7 @@ import uk.gov.hmrc.tai.model.domain.benefits.CompanyCarBenefit
 import uk.gov.hmrc.tai.model.tai.TaxYear
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
 class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
@@ -115,8 +115,11 @@ class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with Mo
 
   private val sampleNinoVersion = 4
 
-  private def createSUT(cacheConnector: CacheConnector, companyCarConnector: CompanyCarConnector) =
-    new CompanyCarBenefitRepository(cacheConnector, companyCarConnector) {
+  private def createSUT(
+    cacheConnector: CacheConnector,
+    companyCarConnector: CompanyCarConnector,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new CompanyCarBenefitRepository(cacheConnector, companyCarConnector, ec) {
       when(companyCarConnector.ninoVersion(any())(any()))
         .thenReturn(Future.successful(sampleNinoVersion))
     }

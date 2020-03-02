@@ -20,11 +20,11 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
@@ -40,6 +40,8 @@ import scala.language.postfixOps
 import scala.util.Random
 
 class PersonControllerSpec extends PlaySpec with MockAuthenticationPredicate with MockitoSugar {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "taxPayer method" should {
     "return 200" when {
@@ -102,5 +104,6 @@ class PersonControllerSpec extends PlaySpec with MockAuthenticationPredicate wit
 
   private def createSUT(
     authenticationPredicate: AuthenticationPredicate = loggedInAuthenticationPredicate,
-    personService: PersonService = mock[PersonService]) = new PersonController(authenticationPredicate, personService)
+    personService: PersonService = mock[PersonService]) =
+    new PersonController(authenticationPredicate, personService, cc)
 }

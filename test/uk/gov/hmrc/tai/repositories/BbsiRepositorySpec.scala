@@ -27,7 +27,7 @@ import uk.gov.hmrc.tai.model.domain.BankAccount
 import uk.gov.hmrc.tai.model.tai.TaxYear
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class BbsiRepositorySpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
@@ -82,6 +82,9 @@ class BbsiRepositorySpec extends PlaySpec with MockitoSugar with MockAuthenticat
 
   private val bankAccount = BankAccount(0, Some("123"), Some("123456"), Some("TEST"), 10.80, Some("Customer"), Some(1))
 
-  private def createSUT(cacheConnector: CacheConnector, bbsiConnector: BbsiConnector) =
-    new BbsiRepository(cacheConnector, bbsiConnector)
+  private def createSUT(
+    cacheConnector: CacheConnector,
+    bbsiConnector: BbsiConnector,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new BbsiRepository(cacheConnector, bbsiConnector, ec)
 }

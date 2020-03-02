@@ -22,13 +22,15 @@ import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.tai.model.FileUploadCallback
 import uk.gov.hmrc.tai.service.{FileUploadService, Open}
+
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 class FileUploadControllerSpec extends PlaySpec with MockitoSugar {
+  val cc = Helpers.stubControllerComponents()
 
   "fileUploadCallback" must {
 
@@ -57,5 +59,5 @@ class FileUploadControllerSpec extends PlaySpec with MockitoSugar {
   }
 
   private def createSUT(fileUploadService: FileUploadService) =
-    new FileUploadController(fileUploadService)
+    new FileUploadController(fileUploadService, cc)
 }

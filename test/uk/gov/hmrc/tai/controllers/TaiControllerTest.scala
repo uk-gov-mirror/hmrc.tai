@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import play.api.test.Helpers.{contentAsJson, _}
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import play.mvc.Http.Status
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.{Generator, Nino}
@@ -42,6 +42,8 @@ import scala.language.postfixOps
 import scala.util.Random
 
 class TaiControllerTest extends PlaySpec with MockitoSugar with MongoFormatter with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "getTaiRoot" should {
 
@@ -233,5 +235,5 @@ class TaiControllerTest extends PlaySpec with MockitoSugar with MongoFormatter w
     taxAccountService: TaxAccountService,
     metrics: Metrics,
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new TaiController(taxAccountService, metrics, authentication)
+    new TaiController(taxAccountService, metrics, authentication, cc)
 }

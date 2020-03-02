@@ -31,7 +31,7 @@ import uk.gov.hmrc.tai.model.domain.calculation.CodingComponent
 import uk.gov.hmrc.tai.model.tai.TaxYear
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.Random
 
@@ -180,6 +180,8 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
       )))
   )
 
-  private def testCodingComponentRepository(taxAccountRepository: TaxAccountRepository) =
-    new CodingComponentRepository(taxAccountRepository)
+  private def testCodingComponentRepository(
+    taxAccountRepository: TaxAccountRepository,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new CodingComponentRepository(taxAccountRepository, ec)
 }

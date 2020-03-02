@@ -22,8 +22,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsResultException, Json}
 import QaData._
 import uk.gov.hmrc.domain.{Generator, Nino}
-
-import util.{Random, Success, Try}
+import scala.util.{Random, Success, Try}
 
 class RtiPackageSpec extends PlaySpec {
 

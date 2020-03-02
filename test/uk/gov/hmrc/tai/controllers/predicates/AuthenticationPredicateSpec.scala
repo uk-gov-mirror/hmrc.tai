@@ -19,11 +19,12 @@ package uk.gov.hmrc.tai.controllers.predicates
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.http.Status
-import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
@@ -31,7 +32,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.TrustedHelper
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate
 
 import scala.util.Random
@@ -40,13 +41,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthenticationPredicateSpec
     extends PlaySpec with MockitoSugar with MockAuthenticationPredicate with ScalaFutures {
 
-  class SUT(val authentication: AuthenticationPredicate) extends BaseController {
+  class SUT(val authentication: AuthenticationPredicate, cc: ControllerComponents) extends BackendController(cc) {
     def get: Action[AnyContent] = authentication.async { implicit request =>
       Future.successful(Ok)
     }
   }
 
-  object TestAuthenticationPredicate extends AuthenticationPredicate(mockAuthService)
+  object TestAuthenticationPredicate extends AuthenticationPredicate(mockAuthService, cc)
 
   val authErrors = Seq[RuntimeException](
     new InsufficientConfidenceLevel,
@@ -65,7 +66,6 @@ class AuthenticationPredicateSpec
   authErrors.foreach(error => {
     s"return UNAUTHORIZED when auth throws a $error" in {
       val mockAuthService = mock[AuthorisedFunctions]
-
       when(mockAuthService.authorised(any()))
         .thenReturn(new mockAuthService.AuthorisedFunction(EmptyPredicate) {
           override def retrieve[A](retrieval: Retrieval[A]) =
@@ -76,22 +76,22 @@ class AuthenticationPredicateSpec
             }
         })
 
-      object TestAuthenticationPredicate extends AuthenticationPredicate(mockAuthService)
-      val result = new SUT(TestAuthenticationPredicate).get.apply(FakeRequest())
+      object TestAuthenticationPredicate extends AuthenticationPredicate(mockAuthService, cc)
+      val result = new SUT(TestAuthenticationPredicate, cc).get.apply(FakeRequest())
 
       status(result) mustBe Status.UNAUTHORIZED
     }
   })
 
   "return OK and contain the user's NINO when called with an Authenticated user" in {
-    class SUT(val authentication: AuthenticationPredicate) extends BaseController {
+    class SUT(val authentication: AuthenticationPredicate, cc: ControllerComponents) extends BackendController(cc) {
       def get: Action[AnyContent] = authentication.async { implicit request =>
         request.nino mustBe nino
         Future.successful(Ok)
       }
     }
 
-    val result = new SUT(TestAuthenticationPredicate).get.apply(FakeRequest())
+    val result = new SUT(TestAuthenticationPredicate, cc).get.apply(FakeRequest())
 
     status(result) mustBe Status.OK
   }
@@ -99,18 +99,20 @@ class AuthenticationPredicateSpec
   "return OK and contain the trusted helper's NINO when called with an Authenticated user" in {
     val principalNino = new Generator(Random).nextNino
     val trustedHelperAuthSuccessResponse =
-      new ~(Some(nino.value), Some(TrustedHelper("principal name", "attorney name", "return url", principalNino)))
+      new ~(
+        Some(nino.value),
+        Some(TrustedHelper("principal name", "attorney name", "return url", principalNino.toString())))
 
     setupMockAuthRetrievalSuccess(trustedHelperAuthSuccessResponse)
 
-    class SUT(val authentication: AuthenticationPredicate) extends BaseController {
+    class SUT(val authentication: AuthenticationPredicate, cc: ControllerComponents) extends BackendController(cc) {
       def get: Action[AnyContent] = authentication.async { implicit request =>
         request.nino mustBe principalNino
         Future.successful(Ok)
       }
     }
 
-    val result = new SUT(TestAuthenticationPredicate).get.apply(FakeRequest())
+    val result = new SUT(TestAuthenticationPredicate, cc).get.apply(FakeRequest())
     status(result) mustBe Status.OK
   }
 }

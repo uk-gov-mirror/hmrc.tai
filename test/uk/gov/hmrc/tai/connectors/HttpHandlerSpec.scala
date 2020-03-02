@@ -29,12 +29,32 @@ import uk.gov.hmrc.tai.controllers.FakeTaiPlayApplication
 import uk.gov.hmrc.tai.metrics.Metrics
 import uk.gov.hmrc.tai.model.enums.APITypes
 import uk.gov.hmrc.http._
-
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class HttpHandlerSpec extends PlaySpec with MockitoSugar with FakeTaiPlayApplication {
+
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  private case class ResponseObject(name: String, age: Int)
+  private implicit val responseObjectFormat = Json.format[ResponseObject]
+  private val responseBodyObject = ResponseObject("aaa", 24)
+
+  private val SuccessfulGetResponseWithObject: HttpResponse =
+    HttpResponse(200, Some(Json.toJson(responseBodyObject)), Map("ETag"                            -> Seq("34")))
+  private val BadRequestHttpResponse = HttpResponse(400, Some(JsString("bad request")), Map("ETag" -> Seq("34")))
+  private val NotFoundHttpResponse: HttpResponse =
+    HttpResponse(404, Some(JsString("not found")), Map("ETag"                                           -> Seq("34")))
+  private val LockedHttpResponse: HttpResponse = HttpResponse(423, Some(JsString("locked")), Map("ETag" -> Seq("34")))
+  private val InternalServerErrorHttpResponse: HttpResponse =
+    HttpResponse(500, Some(JsString("internal server error")), Map("ETag" -> Seq("34")))
+  private val UnknownErrorHttpResponse: HttpResponse =
+    HttpResponse(418, Some(JsString("unknown response")), Map("ETag" -> Seq("34")))
+
+  private def createSUT(metrics: Metrics, http: HttpClient) = new HttpHandler(metrics, http)
 
   "getFromAPI" should {
     "return valid json" when {
@@ -253,22 +273,4 @@ class HttpHandlerSpec extends PlaySpec with MockitoSugar with FakeTaiPlayApplica
     }
   }
 
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-
-  private case class ResponseObject(name: String, age: Int)
-  private implicit val responseObjectFormat = Json.format[ResponseObject]
-  private val responseBodyObject = ResponseObject("aaa", 24)
-
-  private val SuccessfulGetResponseWithObject: HttpResponse =
-    HttpResponse(200, Some(Json.toJson(responseBodyObject)), Map("ETag"                            -> Seq("34")))
-  private val BadRequestHttpResponse = HttpResponse(400, Some(JsString("bad request")), Map("ETag" -> Seq("34")))
-  private val NotFoundHttpResponse: HttpResponse =
-    HttpResponse(404, Some(JsString("not found")), Map("ETag"                                           -> Seq("34")))
-  private val LockedHttpResponse: HttpResponse = HttpResponse(423, Some(JsString("locked")), Map("ETag" -> Seq("34")))
-  private val InternalServerErrorHttpResponse: HttpResponse =
-    HttpResponse(500, Some(JsString("internal server error")), Map("ETag" -> Seq("34")))
-  private val UnknownErrorHttpResponse: HttpResponse =
-    HttpResponse(418, Some(JsString("unknown response")), Map("ETag" -> Seq("34")))
-
-  private def createSUT(metrics: Metrics, http: HttpClient) = new HttpHandler(metrics, http)
 }

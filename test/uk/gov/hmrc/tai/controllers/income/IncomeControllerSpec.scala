@@ -24,7 +24,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.http.{BadRequestException, NotFoundException}
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate
@@ -39,6 +39,8 @@ import uk.gov.hmrc.tai.service.{EmploymentService, IncomeService, TaxAccountServ
 import scala.concurrent.Future
 
 class IncomeControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate with ApiFormats {
+
+  override val cc = Helpers.stubControllerComponents()
 
   val employmentId = 1
   val mockTaxAccountService: TaxAccountService = generateMockAccountServiceWithAnyResponse
@@ -436,7 +438,7 @@ class IncomeControllerSpec extends PlaySpec with MockitoSugar with MockAuthentic
     taxAccountService: TaxAccountService = mock[TaxAccountService],
     employmentService: EmploymentService = mock[EmploymentService],
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new IncomeController(incomeService, taxAccountService, employmentService, authentication)
+    new IncomeController(incomeService, taxAccountService, employmentService, authentication, cc)
 
   private def fakeTaxCodeIncomeRequest: FakeRequest[JsValue] = {
     val updateTaxCodeIncomeRequest = UpdateTaxCodeIncomeRequest(1234)

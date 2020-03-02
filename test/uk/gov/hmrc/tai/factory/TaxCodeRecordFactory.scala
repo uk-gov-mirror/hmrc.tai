@@ -17,6 +17,8 @@
 package uk.gov.hmrc.tai.factory
 
 import org.joda.time.LocalDate
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import play.api.libs.json.{JsNull, JsObject, Json}
 import uk.gov.hmrc.tai.model.TaxCodeRecord
 import uk.gov.hmrc.tai.model.tai.TaxYear

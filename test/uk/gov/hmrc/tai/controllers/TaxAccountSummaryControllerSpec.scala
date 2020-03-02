@@ -23,7 +23,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
@@ -42,6 +42,8 @@ import scala.util.Random
 
 class TaxAccountSummaryControllerSpec
     extends PlaySpec with MockitoSugar with NpsExceptions with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "taxAccountSummaryForYear" must {
     "return the tax summary for the given year" when {
@@ -89,6 +91,6 @@ class TaxAccountSummaryControllerSpec
   private def createSUT(
     taxAccountSummaryService: TaxAccountSummaryService,
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new TaxAccountSummaryController(taxAccountSummaryService, authentication)
+    new TaxAccountSummaryController(taxAccountSummaryService, authentication, cc)
 
 }

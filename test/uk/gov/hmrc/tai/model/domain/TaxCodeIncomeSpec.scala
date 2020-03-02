@@ -17,6 +17,8 @@
 package uk.gov.hmrc.tai.model.domain
 
 import org.joda.time.LocalDate
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.tai.factory.TaxCodeIncomeFactory

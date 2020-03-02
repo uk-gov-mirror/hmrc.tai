@@ -20,10 +20,10 @@ import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
@@ -37,11 +37,13 @@ import uk.gov.hmrc.tai.model.tai.TaxYear
 import uk.gov.hmrc.tai.service.CodingComponentService
 import uk.gov.hmrc.tai.util.{NpsExceptions, RequestQueryFilter}
 
-import scala.concurrent.Future
-import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class CodingComponentControllerSpec
     extends PlaySpec with MockitoSugar with RequestQueryFilter with NpsExceptions with MockAuthenticationPredicate {
+
+  private val cc = Helpers.stubControllerComponents()
 
   "codingComponentsForYear" must {
     "return OK with sequence of coding components" when {
@@ -125,6 +127,7 @@ class CodingComponentControllerSpec
 
   private def createSUT(
     codingComponentService: CodingComponentService,
-    predicate: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new CodingComponentController(predicate, codingComponentService)
+    predicate: AuthenticationPredicate = loggedInAuthenticationPredicate,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new CodingComponentController(predicate, codingComponentService, cc)
 }

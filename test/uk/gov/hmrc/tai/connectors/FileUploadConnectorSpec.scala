@@ -24,13 +24,14 @@ import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.http.Status.{BAD_REQUEST, CREATED, OK}
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.mvc.MultipartFormData
+import play.api.test.Helpers
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.tai.config.FileUploadConfig

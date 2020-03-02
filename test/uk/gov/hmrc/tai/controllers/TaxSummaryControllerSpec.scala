@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import play.api.test.Helpers.{contentAsJson, _}
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.SessionId
@@ -38,6 +38,8 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class TaxSummaryControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "updateEmployments " must {
     "update the estimated pay when user is doing edit employments successfully " in {
@@ -145,5 +147,5 @@ class TaxSummaryControllerSpec extends PlaySpec with MockitoSugar with MockAuthe
     taxAccountService: TaxAccountService,
     metrics: Metrics,
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new TaxSummaryController(taiService, taxAccountService, metrics, authentication)
+    new TaxSummaryController(taiService, taxAccountService, metrics, authentication, cc)
 }

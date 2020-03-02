@@ -25,6 +25,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
+import scala.concurrent.ExecutionContext
+
 class AuditorSpec extends PlaySpec with MockitoSugar {
 
   "Auditable" should {
@@ -61,6 +63,6 @@ class AuditorSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-  private def createSut(audit: AuditConnector) =
-    new Auditor(audit)
+  private def createSut(audit: AuditConnector, ec: ExecutionContext = mock[ExecutionContext]) =
+    new Auditor(audit, ec)
 }

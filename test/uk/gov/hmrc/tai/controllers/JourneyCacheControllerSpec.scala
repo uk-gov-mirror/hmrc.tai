@@ -18,11 +18,12 @@ package uk.gov.hmrc.tai.controllers
 
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsString, Json}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.http.HttpException
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate
 import uk.gov.hmrc.tai.repositories.JourneyCacheRepository
@@ -31,8 +32,10 @@ import scala.concurrent.Future
 
 class JourneyCacheControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
+  override val cc = Helpers.stubControllerComponents()
+
   private def createSUT(repository: JourneyCacheRepository) =
-    new JourneyCacheController(repository, loggedInAuthenticationPredicate)
+    new JourneyCacheController(repository, loggedInAuthenticationPredicate, cc)
 
   val fakeRequest = FakeRequest().withHeaders("X-Session-ID" -> "test")
 

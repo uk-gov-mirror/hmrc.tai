@@ -21,9 +21,13 @@ import org.mockito.Matchers
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import org.joda.time.LocalDate
+import play.api.libs.json.{Format, Json}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import play.api.mvc.Result
-import play.api.test.FakeRequest
+import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, NotFoundException}
@@ -40,6 +44,8 @@ import scala.util.Random
 
 class TaxCodeChangeControllerSpec
     extends PlaySpec with MockitoSugar with MockAuthenticationPredicate with TaxCodeHistoryConstants {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "hasTaxCodeChanged" should {
 
@@ -293,6 +299,6 @@ class TaxCodeChangeControllerSpec
   val mockConfig: FeatureTogglesConfig = mock[FeatureTogglesConfig]
   val taxCodeService: TaxCodeChangeServiceImpl = mock[TaxCodeChangeServiceImpl]
 
-  private def controller = new TaxCodeChangeController(loggedInAuthenticationPredicate, taxCodeService)
+  private def controller = new TaxCodeChangeController(loggedInAuthenticationPredicate, taxCodeService, cc)
   private def ninoGenerator = new Generator(new Random).nextNino
 }

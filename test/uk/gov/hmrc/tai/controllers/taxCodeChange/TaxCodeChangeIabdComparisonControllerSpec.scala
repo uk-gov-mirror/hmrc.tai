@@ -22,9 +22,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.mvc.Result
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.domain.Generator
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.tai.factory.TaxFreeAmountComparisonFactory
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate
 import uk.gov.hmrc.tai.service.TaxFreeAmountComparisonService
@@ -33,6 +34,8 @@ import scala.concurrent.Future
 import scala.util.Random
 
 class TaxCodeChangeIabdComparisonControllerSpec extends PlaySpec with MockAuthenticationPredicate with MockitoSugar {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "taxCodeChangeIabdComparison" should {
     "respond with OK" when {
@@ -72,6 +75,6 @@ class TaxCodeChangeIabdComparisonControllerSpec extends PlaySpec with MockAuthen
   private val taxFreeAmountComparisonService = mock[TaxFreeAmountComparisonService]
 
   val testController =
-    new TaxCodeChangeIabdComparisonController(taxFreeAmountComparisonService, loggedInAuthenticationPredicate)
+    new TaxCodeChangeIabdComparisonController(taxFreeAmountComparisonService, loggedInAuthenticationPredicate, cc)
 
 }

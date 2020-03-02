@@ -24,7 +24,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json, Writes}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
@@ -33,7 +34,11 @@ import uk.gov.hmrc.tai.model.enums.PayFreq
 import uk.gov.hmrc.tai.model.{CalculatedPay, PayDetails}
 import uk.gov.hmrc.tai.service.TaiService
 
+import scala.concurrent.ExecutionContext
+
 class EstimatedPayCalculatorControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "Estimated pay calculator controller" should {
     "return an OK response with CalculatedPay json" when {
@@ -64,8 +69,9 @@ class EstimatedPayCalculatorControllerSpec extends PlaySpec with MockitoSugar wi
 
   private def createSUT(
     taiService: TaiService,
-    authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new EstimatedPayCalculatorController(taiService, authentication)
+    authentication: AuthenticationPredicate = loggedInAuthenticationPredicate,
+    ec: ExecutionContext = mock[ExecutionContext]) =
+    new EstimatedPayCalculatorController(taiService, authentication, cc)
 
   val date = new LocalDate(2017, 4, 14)
 

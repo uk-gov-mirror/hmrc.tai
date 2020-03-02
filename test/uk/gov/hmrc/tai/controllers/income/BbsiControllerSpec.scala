@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, Json}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.logging.SessionId
@@ -42,6 +42,8 @@ import scala.concurrent.{Await, Future}
 import scala.util.Random
 
 class BbsiControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
+
+  override val cc = Helpers.stubControllerComponents()
 
   "Bbsi details" must {
     "return OK" in {
@@ -352,5 +354,5 @@ class BbsiControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticat
   private def createSUT(
     bbsiService: BbsiService,
     authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new BbsiController(bbsiService, authentication)
+    new BbsiController(bbsiService, authentication, cc)
 }

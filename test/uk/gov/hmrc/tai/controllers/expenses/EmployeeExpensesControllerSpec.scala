@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, Json}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.MissingBearerToken
 import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.http.logging.SessionId
@@ -42,8 +42,10 @@ class EmployeeExpensesControllerSpec extends PlaySpec with MockitoSugar with Moc
 
   private val mockEmployeeExpensesService = mock[EmployeeExpensesService]
 
+  override val cc = Helpers.stubControllerComponents()
+
   private def controller(authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
-    new EmployeeExpensesController(authentication, employeeExpensesService = mockEmployeeExpensesService)
+    new EmployeeExpensesController(authentication, employeeExpensesService = mockEmployeeExpensesService, cc)
 
   private val iabd = 56
   private val iabdUpdateExpensesRequest = IabdUpdateExpensesRequest(1, grossAmount = 100)

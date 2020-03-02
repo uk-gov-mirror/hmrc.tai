@@ -18,8 +18,9 @@ package uk.gov.hmrc.tai.mocks
 
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import play.api.test.Helpers
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, MissingBearerToken}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.SessionId
 import uk.gov.hmrc.tai.connectors.CacheId
 import uk.gov.hmrc.tai.controllers.predicates.AuthenticationPredicate
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
@@ -37,7 +38,9 @@ trait MockAuthenticationPredicate extends BeforeAndAfterEach with MockitoSugar {
 
   val mockAuthService = mock[AuthorisedFunctions]
 
-  val loggedInAuthenticationPredicate = new AuthenticationPredicate(mockAuthService)
+  val cc = Helpers.stubControllerComponents()
+
+  val loggedInAuthenticationPredicate = new AuthenticationPredicate(mockAuthService, cc)
 
   val nino = new Generator(Random).nextNino
 

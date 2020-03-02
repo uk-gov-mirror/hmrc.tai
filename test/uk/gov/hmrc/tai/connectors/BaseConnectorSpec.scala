@@ -33,13 +33,35 @@ import uk.gov.hmrc.tai.model.enums.APITypes
 import uk.gov.hmrc.tai.model.nps.{Person, PersonDetails}
 import uk.gov.hmrc.tai.model.rti.{RtiData, RtiStatus}
 import uk.gov.hmrc.tai.model.tai.TaxYear
-
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.Random
 
 class BaseConnectorSpec extends PlaySpec with MockitoSugar {
+
+  private case class ResponseObject(name: String, age: Int)
+  private implicit val responseObjectFormat = Json.format[ResponseObject]
+  private val responseBodyObject = ResponseObject("ttt", 24)
+
+  private val SuccesfulGetResponseWithObject: HttpResponse =
+    HttpResponse(200, Some(Json.toJson(responseBodyObject)), Map("ETag"                            -> Seq("34")))
+  private val BadRequestHttpResponse = HttpResponse(400, Some(JsString("bad request")), Map("ETag" -> Seq("34")))
+  private val UnknownErrorHttpResponse: HttpResponse =
+    HttpResponse(418, Some(JsString("unknown response")), Map("ETag" -> Seq("34")))
+  private val NotFoundHttpResponse: HttpResponse =
+    HttpResponse(404, Some(JsString("not found")), Map("ETag" -> Seq("34")))
+  private val InternalServerErrorHttpResponse: HttpResponse =
+    HttpResponse(500, Some(JsString("internal server error")), Map("ETag" -> Seq("34")))
+  private val nino: Nino = new Generator(new Random).nextNino
+
+  private def createSUT(auditor: Auditor, metrics: Metrics, httpClient: HttpClient) =
+    new BaseConnector(auditor, metrics, httpClient) {
+
+      override val originatorId: String = "testOriginatorId"
+    }
 
   "BaseConnector" should {
     "get the version from the HttpResponse" when {
@@ -863,26 +885,5 @@ class BaseConnectorSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
-
-  private case class ResponseObject(name: String, age: Int)
-  private implicit val responseObjectFormat = Json.format[ResponseObject]
-  private val responseBodyObject = ResponseObject("ttt", 24)
-
-  private val SuccesfulGetResponseWithObject: HttpResponse =
-    HttpResponse(200, Some(Json.toJson(responseBodyObject)), Map("ETag"                            -> Seq("34")))
-  private val BadRequestHttpResponse = HttpResponse(400, Some(JsString("bad request")), Map("ETag" -> Seq("34")))
-  private val UnknownErrorHttpResponse: HttpResponse =
-    HttpResponse(418, Some(JsString("unknown response")), Map("ETag" -> Seq("34")))
-  private val NotFoundHttpResponse: HttpResponse =
-    HttpResponse(404, Some(JsString("not found")), Map("ETag" -> Seq("34")))
-  private val InternalServerErrorHttpResponse: HttpResponse =
-    HttpResponse(500, Some(JsString("internal server error")), Map("ETag" -> Seq("34")))
-  private val nino: Nino = new Generator(new Random).nextNino
-
-  private def createSUT(auditor: Auditor, metrics: Metrics, httpClient: HttpClient) =
-    new BaseConnector(auditor, metrics, httpClient) {
-
-      override val originatorId: String = "testOriginatorId"
-    }
 
 }
