@@ -19,7 +19,7 @@ package uk.gov.hmrc.tai.repositories
 import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.tai.connectors.{CacheConnector, CompanyCarConnector}
 import uk.gov.hmrc.tai.mocks.MockAuthenticationPredicate

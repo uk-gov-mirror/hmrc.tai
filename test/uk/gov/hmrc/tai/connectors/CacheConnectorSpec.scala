@@ -19,7 +19,7 @@ package uk.gov.hmrc.tai.connectors
 import org.mockito.Matchers.{any, eq => Meq}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Play
 import play.api.libs.json.{JsString, Json}

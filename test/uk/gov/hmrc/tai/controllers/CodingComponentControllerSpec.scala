@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CodingComponentControllerSpec
     extends PlaySpec with MockitoSugar with RequestQueryFilter with NpsExceptions with MockAuthenticationPredicate {
 
-  private val cc = Helpers.stubControllerComponents()
+  override val cc = Helpers.stubControllerComponents()
 
   "codingComponentsForYear" must {
     "return OK with sequence of coding components" when {
@@ -127,7 +127,6 @@ class CodingComponentControllerSpec
 
   private def createSUT(
     codingComponentService: CodingComponentService,
-    predicate: AuthenticationPredicate = loggedInAuthenticationPredicate,
-    ec: ExecutionContext = mock[ExecutionContext]) =
+    predicate: AuthenticationPredicate = loggedInAuthenticationPredicate) =
     new CodingComponentController(predicate, codingComponentService, cc)
 }

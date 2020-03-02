@@ -18,10 +18,10 @@ package uk.gov.hmrc.tai.model.rti
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsResultException, Json}
+import play.api.libs.json.{JsPath, JsResultException, Json, JsonValidationError}
 import QaData._
 import uk.gov.hmrc.domain.{Generator, Nino}
+
 import scala.util.{Random, Success, Try}
 
 class RtiPackageSpec extends PlaySpec {
@@ -42,9 +42,9 @@ class RtiPackageSpec extends PlaySpec {
         }
 
         val msg: Seq[String] = for {
-          (_, validations)            <- ex.errors
-          validation: ValidationError <- validations
-          messages: String            <- validation.messages
+          (_, validations)                <- ex.errors
+          validation: JsonValidationError <- validations
+          messages: String                <- validation.messages
         } yield {
           messages
         }
