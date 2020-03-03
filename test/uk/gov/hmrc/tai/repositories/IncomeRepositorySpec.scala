@@ -36,15 +36,17 @@ import scala.language.postfixOps
 import scala.util.Random
 
 class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
+  val mockTaxAccountRepository = mock[TaxAccountRepository]
+  val mockBbsiRepository = mock[BbsiRepository]
+  val mockIabdRepository = mock[IabdRepository]
 
   "Income" must {
     "return empty sequence of non-tax code income" when {
       "there is no non-tax-code income present" in {
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
-        val mockBbsiRepository = mock[BbsiRepository]
+
         when(mockTaxAccountRepository.taxAccount(any(), any())(any())).thenReturn(Future.successful(Json.arr()))
 
-        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
 
         val result = Await.result(sut.incomes(nino, TaxYear()), 5.seconds)
 
@@ -54,8 +56,6 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
 
     "return non-tax-code incomes" when {
       "there is non-tax-code income present and bank-accounts are not present" in {
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
-        val mockBbsiRepository = mock[BbsiRepository]
         val json = taxAccountJsonWithIabds(
           npsIabdSummaries(
             1,
@@ -65,7 +65,7 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
         when(mockTaxAccountRepository.taxAccount(any(), any())(any())).thenReturn(Future.successful(json))
         when(mockBbsiRepository.bbsiDetails(any(), any())(any())).thenReturn(Future.successful(Seq.empty[BankAccount]))
 
-        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
 
         val result = Await.result(sut.incomes(nino, TaxYear()), 5.seconds)
 
@@ -105,15 +105,14 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
       }
 
       "non-tax-code income and bank accounts are present" in {
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
-        val mockBbsiRepository = mock[BbsiRepository]
+
         val json = taxAccountJsonWithIabds(npsIabdSummaries(1, Seq(82), 100))
         when(mockTaxAccountRepository.taxAccount(any(), any())(any())).thenReturn(Future.successful(json))
 
         when(mockBbsiRepository.bbsiDetails(any(), any())(any()))
           .thenReturn(Future.successful(Seq(bankAccount, bankAccount)))
 
-        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
 
         val result = Await.result(sut.incomes(nino, TaxYear()), 5.seconds)
 
@@ -123,12 +122,11 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
 
       "bypass any bank account retrieval and return no untaxed interest" when {
         "no UntaxedInterestIncome is present" in {
-          val mockTaxAccountRepository = mock[TaxAccountRepository]
-          val mockBbsiRepository = mock[BbsiRepository]
+
           val json = taxAccountJsonWithIabds(npsIabdSummaries(1, Seq(70), 100))
           when(mockTaxAccountRepository.taxAccount(any(), any())(any())).thenReturn(Future.successful(json))
 
-          val sut = createSut(mockTaxAccountRepository, mockBbsiRepository)
+          val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
 
           val result = Await.result(sut.incomes(nino, TaxYear()), 5.seconds)
 
@@ -137,14 +135,13 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
       }
 
       "bbsi api throws exception" in {
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
-        val mockBbsiRepository = mock[BbsiRepository]
+
         val json = taxAccountJsonWithIabds(npsIabdSummaries(1, Seq(82), 100))
         when(mockTaxAccountRepository.taxAccount(any(), any())(any())).thenReturn(Future.successful(json))
         when(mockBbsiRepository.bbsiDetails(any(), any())(any()))
           .thenReturn(Future.failed(new RuntimeException("Error")))
 
-        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
 
         val result = Await.result(sut.incomes(nino, TaxYear()), 5.seconds)
 
@@ -185,13 +182,11 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
 
         val iabdJson = Json.arr()
 
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(json))
-        val mockIabdRepository = mock[IabdRepository]
         when(mockIabdRepository.iabds(any(), any())(any())).thenReturn(Future.successful(iabdJson))
 
-        val sut = createSut(mockTaxAccountRepository, iabdRepository = mockIabdRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
         val result = Await.result(sut.taxCodeIncomes(nino, TaxYear()), 5 seconds)
 
         result mustBe Seq(
@@ -278,13 +273,11 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
           )
         )
 
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(json))
-        val mockIabdRepository = mock[IabdRepository]
         when(mockIabdRepository.iabds(any(), any())(any())).thenReturn(Future.successful(iabdJson))
 
-        val sut = createSut(mockTaxAccountRepository, iabdRepository = mockIabdRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
         val result = Await.result(sut.taxCodeIncomes(nino, TaxYear()), 5 seconds)
 
         result mustBe Seq(
@@ -372,13 +365,11 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
           )
         )
 
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(json))
-        val mockIabdRepository = mock[IabdRepository]
         when(mockIabdRepository.iabds(any(), any())(any())).thenReturn(Future.successful(iabdJson))
 
-        val sut = createSut(mockTaxAccountRepository, iabdRepository = mockIabdRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
         val result = Await.result(sut.taxCodeIncomes(nino, TaxYear()), 5 seconds)
 
         result mustBe Seq(
@@ -467,13 +458,11 @@ class IncomeRepositorySpec extends PlaySpec with MockitoSugar {
           )
         )
 
-        val mockTaxAccountRepository = mock[TaxAccountRepository]
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(json))
-        val mockIabdRepository = mock[IabdRepository]
         when(mockIabdRepository.iabds(any(), any())(any())).thenReturn(Future.successful(iabdJson))
 
-        val sut = createSut(mockTaxAccountRepository, iabdRepository = mockIabdRepository)
+        val sut = createSut(mockTaxAccountRepository, mockBbsiRepository, mockIabdRepository, ExecutionContext.global)
         val result = Await.result(sut.taxCodeIncomes(nino, TaxYear()), 5 seconds)
 
         result mustBe Seq(

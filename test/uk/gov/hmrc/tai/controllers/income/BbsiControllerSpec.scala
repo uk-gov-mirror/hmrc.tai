@@ -38,12 +38,10 @@ import uk.gov.hmrc.tai.service.benefits.BenefitsService
 import uk.gov.hmrc.tai.service.{BankAccountNotFound, BbsiService}
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Random
 
 class BbsiControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
-
-  override val cc = Helpers.stubControllerComponents()
 
   "Bbsi details" must {
     "return OK" in {

@@ -18,11 +18,11 @@ package uk.gov.hmrc.tai.controllers
 
 import org.scalatest.{Args, Status, Suite, TestSuite}
 import org.scalatest.concurrent.PatienceConfiguration
-import org.scalatestplus.play.OneServerPerSuite
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-trait FakeTaiPlayApplication extends OneServerPerSuite with PatienceConfiguration with TestSuite {
+trait FakeTaiPlayApplication extends GuiceOneServerPerSuite with PatienceConfiguration with TestSuite {
   this: Suite =>
 
   override lazy val port = 19331
@@ -34,5 +34,6 @@ trait FakeTaiPlayApplication extends OneServerPerSuite with PatienceConfiguratio
       .configure(additionalConfiguration)
       .build()
 
-  abstract override def run(testName: Option[String], args: Args): Status = super[OneServerPerSuite].run(testName, args)
+  abstract override def run(testName: Option[String], args: Args): Status =
+    super[GuiceOneServerPerSuite].run(testName, args)
 }

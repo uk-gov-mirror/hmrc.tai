@@ -39,8 +39,6 @@ import scala.language.postfixOps
 
 class TaxSummaryControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "updateEmployments " must {
     "update the estimated pay when user is doing edit employments successfully " in {
       val updateEmployment1 = EmploymentAmount("test1", "desc", 1, newAmount = 123, oldAmount = 222)

@@ -38,8 +38,6 @@ import scala.language.postfixOps
 
 class EmploymentsControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "employments" must {
     "return Ok" when {
       "called with a valid nino and year" in {

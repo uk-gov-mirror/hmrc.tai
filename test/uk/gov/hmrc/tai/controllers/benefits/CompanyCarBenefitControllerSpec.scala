@@ -40,8 +40,6 @@ import scala.util.Random
 
 class CompanyCarBenefitControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "companyCarBenefits" must {
     "return NotFound" when {
       "company car benefit service returns Nil" in {

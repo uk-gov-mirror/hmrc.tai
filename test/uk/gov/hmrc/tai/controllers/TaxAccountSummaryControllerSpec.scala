@@ -43,8 +43,6 @@ import scala.util.Random
 class TaxAccountSummaryControllerSpec
     extends PlaySpec with MockitoSugar with NpsExceptions with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "taxAccountSummaryForYear" must {
     "return the tax summary for the given year" when {
       "tax year is CY+1" in {

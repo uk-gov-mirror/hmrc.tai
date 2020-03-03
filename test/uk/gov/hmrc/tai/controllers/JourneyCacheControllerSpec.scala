@@ -32,8 +32,6 @@ import scala.concurrent.Future
 
 class JourneyCacheControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   private def createSUT(repository: JourneyCacheRepository) =
     new JourneyCacheController(repository, loggedInAuthenticationPredicate, cc)
 

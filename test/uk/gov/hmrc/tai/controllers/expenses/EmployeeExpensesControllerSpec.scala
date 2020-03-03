@@ -42,8 +42,6 @@ class EmployeeExpensesControllerSpec extends PlaySpec with MockitoSugar with Moc
 
   private val mockEmployeeExpensesService = mock[EmployeeExpensesService]
 
-  override val cc = Helpers.stubControllerComponents()
-
   private def controller(authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
     new EmployeeExpensesController(authentication, employeeExpensesService = mockEmployeeExpensesService, cc)
 

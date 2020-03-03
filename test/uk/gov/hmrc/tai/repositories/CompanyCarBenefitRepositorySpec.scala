@@ -41,7 +41,7 @@ class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with Mo
         when(mockCacheConnector.find[Seq[CompanyCarBenefit]](any(), any())(any()))
           .thenReturn(Future.successful(Some(carBenefitSeq)))
 
-        val sut = createSUT(mockCacheConnector, mock[CompanyCarConnector])
+        val sut = createSUT(mockCacheConnector, mock[CompanyCarConnector], ExecutionContext.global)
         Await.result(sut.carBenefit(nino, TaxYear(2017)), 5 seconds) mustBe carBenefitSeq
       }
     }
@@ -56,7 +56,7 @@ class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with Mo
         when(mockCacheConnector.find[Seq[CompanyCarBenefit]](any(), any())(any()))
           .thenReturn(Future.successful(Some(carBenefitSeqWithVersion)))
 
-        val sut = createSUT(mockCacheConnector, mock[CompanyCarConnector])
+        val sut = createSUT(mockCacheConnector, mock[CompanyCarConnector], ExecutionContext.global)
         Await.result(sut.carBenefit(nino, TaxYear(2017)), 5 seconds) mustBe carBenefitSeqWithVersion
       }
     }
@@ -76,7 +76,7 @@ class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with Mo
         when(mockCompanyCarConnector.carBenefits(any(), any())(any()))
           .thenReturn(Future.successful(carBenefitFromCompanyCarService))
 
-        val sut = createSUT(mockCacheConnector, mockCompanyCarConnector)
+        val sut = createSUT(mockCacheConnector, mockCompanyCarConnector, ExecutionContext.global)
         Await.result(sut.carBenefit(nino, TaxYear(2017)), 5 seconds) mustBe carBenefitFromCompanyCarService
 
         verify(mockCacheConnector, times(1))
@@ -101,7 +101,7 @@ class CompanyCarBenefitRepositorySpec extends PlaySpec with MockitoSugar with Mo
         when(mockCompanyCarConnector.carBenefits(any(), any())(any()))
           .thenReturn(Future.successful(carBenefitSeq))
 
-        val sut = createSUT(mockCacheConnector, mockCompanyCarConnector)
+        val sut = createSUT(mockCacheConnector, mockCompanyCarConnector, ExecutionContext.global)
         Await.result(sut.carBenefit(nino, TaxYear(2017)), 5 seconds) mustBe carBenefitSeqWithVersion
 
         verify(mockCacheConnector, times(1))

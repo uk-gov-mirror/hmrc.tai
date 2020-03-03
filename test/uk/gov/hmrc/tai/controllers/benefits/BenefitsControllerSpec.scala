@@ -36,12 +36,10 @@ import uk.gov.hmrc.tai.model.tai.TaxYear
 import uk.gov.hmrc.tai.service.CodingComponentService
 import uk.gov.hmrc.tai.service.benefits.BenefitsService
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 class BenefitsControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
-
-  override val cc = Helpers.stubControllerComponents()
 
   "benefits" must {
     "return Benefits case class with empty lists" when {

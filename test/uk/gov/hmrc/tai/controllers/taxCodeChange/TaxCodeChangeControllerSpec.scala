@@ -45,8 +45,6 @@ import scala.util.Random
 class TaxCodeChangeControllerSpec
     extends PlaySpec with MockitoSugar with MockAuthenticationPredicate with TaxCodeHistoryConstants {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "hasTaxCodeChanged" should {
 
     "return true" when {

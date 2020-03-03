@@ -45,8 +45,6 @@ import scala.util.Random
 
 class TotalTaxControllerSpec extends PlaySpec with MockitoSugar with NpsExceptions with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "totalTax" must {
     "return the total tax details for the given year" in {
       val mockTotalTaxService = mock[TotalTaxService]

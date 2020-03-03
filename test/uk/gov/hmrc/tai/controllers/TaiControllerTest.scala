@@ -43,8 +43,6 @@ import scala.util.Random
 
 class TaiControllerTest extends PlaySpec with MockitoSugar with MongoFormatter with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "getTaiRoot" should {
 
     "return the TaiRoot for the supplied nino " in {

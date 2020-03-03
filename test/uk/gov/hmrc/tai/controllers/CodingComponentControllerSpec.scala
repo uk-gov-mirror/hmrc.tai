@@ -43,8 +43,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class CodingComponentControllerSpec
     extends PlaySpec with MockitoSugar with RequestQueryFilter with NpsExceptions with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "codingComponentsForYear" must {
     "return OK with sequence of coding components" when {
       "coding component service returns a sequence of coding components" in {

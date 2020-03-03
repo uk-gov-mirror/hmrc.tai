@@ -40,7 +40,7 @@ class BbsiRepositorySpec extends PlaySpec with MockitoSugar with MockAuthenticat
         when(mockCacheConnector.findOptSeq[BankAccount](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(bankAccount))))
 
-        val sut = createSUT(mockCacheConnector, mockBbsiConnector)
+        val sut = createSUT(mockCacheConnector, mockBbsiConnector, ExecutionContext.global)
         val result = Await.result(sut.bbsiDetails(nino, TaxYear()), 5.seconds)
 
         result mustBe Seq(bankAccount)
@@ -64,7 +64,7 @@ class BbsiRepositorySpec extends PlaySpec with MockitoSugar with MockAuthenticat
         when(mockBbsiConnector.bankAccounts(any(), any())(any()))
           .thenReturn(Future.successful(Seq(bankAccount, bankAccount)))
 
-        val sut = createSUT(mockCacheConnector, mockBbsiConnector)
+        val sut = createSUT(mockCacheConnector, mockBbsiConnector, ExecutionContext.global)
         val result = Await.result(sut.bbsiDetails(nino, TaxYear()), 5.seconds)
 
         result mustBe Seq(expectedBankAccount1, expectedBankAccount2)

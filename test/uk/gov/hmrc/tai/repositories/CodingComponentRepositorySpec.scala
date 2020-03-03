@@ -45,7 +45,7 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(emptyJson))
 
-        val sut = testCodingComponentRepository(mockTaxAccountRepository)
+        val sut = testCodingComponentRepository(mockTaxAccountRepository, ExecutionContext.global)
         val result = Await.result(sut.codingComponents(nino, TaxYear()), 5 seconds)
 
         result mustBe Nil
@@ -59,7 +59,7 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
         when(mockTaxAccountRepository.taxAccount(Matchers.eq(nino), Matchers.eq(TaxYear()))(any()))
           .thenReturn(Future.successful(primaryIncomeDeductionsNpsJson))
 
-        val sut = testCodingComponentRepository(mockTaxAccountRepository)
+        val sut = testCodingComponentRepository(mockTaxAccountRepository, ExecutionContext.global)
         val result = Await.result(sut.codingComponents(nino, TaxYear()), 5 seconds)
 
         result mustBe Seq(
@@ -86,7 +86,7 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
       when(mockTaxAccountRepository.taxAccountForTaxCodeId(Matchers.eq(nino), Matchers.eq(taxCodeId))(any()))
         .thenReturn(Future.successful(json))
 
-      val repository = testCodingComponentRepository(mockTaxAccountRepository)
+      val repository = testCodingComponentRepository(mockTaxAccountRepository, ExecutionContext.global)
 
       val result = Await.result(repository.codingComponentsForTaxCodeId(nino, taxCodeId), 5 seconds)
 
@@ -107,7 +107,7 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
       when(mockTaxAccountRepository.taxAccountForTaxCodeId(Matchers.eq(nino), Matchers.eq(taxCodeId))(any()))
         .thenReturn(Future.successful(json))
 
-      val repository = testCodingComponentRepository(mockTaxAccountRepository)
+      val repository = testCodingComponentRepository(mockTaxAccountRepository, ExecutionContext.global)
 
       val result = Await.result(repository.codingComponentsForTaxCodeId(nino, taxCodeId), 5 seconds)
 
@@ -129,7 +129,7 @@ class CodingComponentRepositorySpec extends PlaySpec with MockitoSugar {
       when(mockTaxAccountRepository.taxAccountForTaxCodeId(Matchers.eq(nino), Matchers.eq(taxCodeId))(any()))
         .thenReturn(Future.successful(json))
 
-      val repository = testCodingComponentRepository(mockTaxAccountRepository)
+      val repository = testCodingComponentRepository(mockTaxAccountRepository, ExecutionContext.global)
 
       val result = Await.result(repository.codingComponentsForTaxCodeId(nino, taxCodeId), 5 seconds)
 

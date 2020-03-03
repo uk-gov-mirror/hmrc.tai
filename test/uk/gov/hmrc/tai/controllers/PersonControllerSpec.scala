@@ -41,8 +41,6 @@ import scala.util.Random
 
 class PersonControllerSpec extends PlaySpec with MockAuthenticationPredicate with MockitoSugar {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "taxPayer method" should {
     "return 200" when {
       "given a valid nino" in {

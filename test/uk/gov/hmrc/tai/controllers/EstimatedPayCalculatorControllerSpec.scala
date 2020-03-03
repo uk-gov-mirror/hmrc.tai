@@ -38,8 +38,6 @@ import scala.concurrent.ExecutionContext
 
 class EstimatedPayCalculatorControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "Estimated pay calculator controller" should {
     "return an OK response with CalculatedPay json" when {
       "given a valid request" in {
@@ -69,8 +67,7 @@ class EstimatedPayCalculatorControllerSpec extends PlaySpec with MockitoSugar wi
 
   private def createSUT(
     taiService: TaiService,
-    authentication: AuthenticationPredicate = loggedInAuthenticationPredicate,
-    ec: ExecutionContext = mock[ExecutionContext]) =
+    authentication: AuthenticationPredicate = loggedInAuthenticationPredicate) =
     new EstimatedPayCalculatorController(taiService, authentication, cc)
 
   val date = new LocalDate(2017, 4, 14)

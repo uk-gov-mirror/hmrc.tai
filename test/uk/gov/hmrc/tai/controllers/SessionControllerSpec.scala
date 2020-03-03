@@ -30,8 +30,6 @@ import scala.concurrent.Future
 
 class SessionControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   private def createSUT(sessionRepository: SessionRepository) =
     new SessionController(sessionRepository, loggedInAuthenticationPredicate, cc)
 

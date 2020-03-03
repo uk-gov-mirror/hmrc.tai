@@ -38,8 +38,6 @@ import scala.concurrent.Future
 
 class PensionProviderControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "addPensionProvider" must {
     "return envelope Id" when {
       "called with valid add pension request" in {

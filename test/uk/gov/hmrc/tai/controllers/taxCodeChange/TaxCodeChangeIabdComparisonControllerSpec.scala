@@ -35,8 +35,6 @@ import scala.util.Random
 
 class TaxCodeChangeIabdComparisonControllerSpec extends PlaySpec with MockAuthenticationPredicate with MockitoSugar {
 
-  override val cc = Helpers.stubControllerComponents()
-
   "taxCodeChangeIabdComparison" should {
     "respond with OK" when {
       "when given a valid Nino" in {

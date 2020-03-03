@@ -40,8 +40,6 @@ import scala.concurrent.Future
 
 class IncomeControllerSpec extends PlaySpec with MockitoSugar with MockAuthenticationPredicate with ApiFormats {
 
-  override val cc = Helpers.stubControllerComponents()
-
   val employmentId = 1
   val mockTaxAccountService: TaxAccountService = generateMockAccountServiceWithAnyResponse
   val expectedJsonEmpty: JsObject = Json.obj(
