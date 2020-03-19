@@ -21,7 +21,7 @@ import play.api.Logger
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, ConfidenceLevel}
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, ConfidenceLevel, SessionRecordNotFound}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
@@ -35,6 +35,7 @@ class AuthenticationPredicate @Inject()(val authorisedFunctions: AuthorisedFunct
 
   def async(action: AuthenticatedRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     Action.async { implicit request: Request[AnyContent] =>
+      throw SessionRecordNotFound()
       authorisedFunctions
         .authorised(ConfidenceLevel.L100)
         .retrieve(Retrievals.nino and Retrievals.trustedHelper) {
@@ -51,6 +52,8 @@ class AuthenticationPredicate @Inject()(val authorisedFunctions: AuthorisedFunct
 
   def async[A](bodyParser: BodyParser[A])(action: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     Action.async(bodyParser) { implicit request =>
+      throw SessionRecordNotFound()
+
       authorisedFunctions
         .authorised(ConfidenceLevel.L100)
         .retrieve(Retrievals.nino and Retrievals.trustedHelper) {
