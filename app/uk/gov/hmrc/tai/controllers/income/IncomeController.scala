@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.auth.core.SessionRecordNotFound
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import uk.gov.hmrc.tai.controllers.ControllerErrorHandler
@@ -50,6 +51,7 @@ class IncomeController @Inject()(
   }
 
   def taxCodeIncomesForYear(nino: Nino, year: TaxYear): Action[AnyContent] = authentication.async { implicit request =>
+    throw new SessionRecordNotFound()
     incomeService.taxCodeIncomes(nino, year).map {
       case Seq() => NotFound
       case taxCodeIncomes =>
@@ -75,6 +77,8 @@ class IncomeController @Inject()(
   }
 
   def income(nino: Nino, year: TaxYear): Action[AnyContent] = authentication.async { implicit request =>
+    throw SessionRecordNotFound()
+
     incomeService.incomes(nino, year).map { income =>
       Ok(Json.toJson(ApiResponse(income, Seq.empty[ApiLink])))
     } recoverWith taxAccountErrorHandler
